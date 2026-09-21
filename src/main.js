@@ -1,71 +1,82 @@
 import './style.css';
 
-// Fallback to DEMO_KEY if VITE_NASA_API_KEY environment variable is missing
+// Config & Element Selectors
 const API_KEY = import.meta.env.VITE_NASA_API_KEY || 'DEMO_KEY';
-const app = document.querySelector('#app');
-const datePicker = document.querySelector('#datepicker');
+const appContainer = document.getElementById('app');
+const dateInput = document.getElementById('datepicker');
+const randomButton = document.getElementById('random-btn');
 
-// Set maximum allowed date to today in YYYY-MM-DD format
-const today = new Date().toISOString().split('T')[0];
-datePicker.value = today;
-datePicker.max = today;
+// Set max date allowed to today (YYYY-MM-DD)
+const todayString = new Date().toISOString().split('T')[0];
+dateInput.max = todayString;
+dateInput.value = todayString;
 
-function fetchAPOD(selectedDate = '') {
-  app.innerHTML = `<p class="loading">Loading APOD...</p>`;
+// Fetch APOD telemetry using standard async/await
+async function loadSpacePicture(targetDate) {
+  appContainer.innerHTML = `<p class="loading">> LOADING TELEMETRY...</p>`;
 
-  const url = selectedDate
-    ? `https://api.nasa.gov/planetary/apod?api_key=${API_KEY}&date=${selectedDate}`
-    : `https://api.nasa.gov/planetary/apod?api_key=${API_KEY}`;
+  const endpoint = `https://api.nasa.gov/planetary/apod?api_key=${API_KEY}&date=${targetDate}`;
 
-  fetch(url)
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      return response.json();
-    })
-    .then((data) => {
-      let media;
+  try {
+    const response = await fetch(endpoint);
+    if (!response.ok) {
+      throw new Error(`Status: ${response.status}`);
+    }
 
-      if (data.media_type === 'image') {
-        media = `<img src="${data.url}" alt="${data.title}" />`;
-      } else if (data.media_type === 'video') {
-        // Render as iframe if it's an embedded web player (like YouTube or Vimeo)
-        if (data.url.includes('youtube') || data.url.includes('vimeo') || data.url.includes('embed')) {
-          media = `<iframe src="${data.url}" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
-        } else {
-          media = `<video src="${data.url}" controls></video>`;
-        }
-      } else {
-        media = `<p>Unsupported media format</p>`;
-      }
-
-      app.innerHTML = `
-        <div class="apod-card">
-          <h1>${data.title}</h1>
-          <p class="date">${data.date}</p>
-          <div class="media-wrapper">
-            ${media}
-          </div>
-          <p class="explanation">${data.explanation || ''}</p>
-        </div>
-      `;
-    })
-    .catch((err) => {
-      console.error('Fetch error:', err);
-      app.innerHTML = `
-        <div class="error-card">
-          <h2>Failed to load NASA APOD</h2>
-          <p>Error: ${err.message}</p>
-        </div>
-      `;
-    });
+    const apodData = await response.json();
+    renderScreen(apodData);
+  } catch (error) {
+    appContainer.innerHTML = `
+      <div class="error-card">
+        <p>> TRANSMISSION ERROR</p>
+        <p>${error.message}</p>
+      </div>
+    `;
+  }
 }
 
-// Fetch new APOD when a date is selected from the calendar picker
-datePicker.addEventListener('change', (e) => {
-  fetchAPOD(e.target.value);
-});
+// Build media frame and text layout
+function renderScreen(data) {
+  let mediaHtml = '';
 
-// Initial load
-fetchAPOD(datePicker.value);
+  if (data.media_type === 'image') {
+    mediaHtml = `<img src="${data.url}" alt="${data.title}" />`;
+  } else if (data.media_type === 'video') {
+    if (data.url.includes('youtube') || data.url.includes('vimeo') || data.url.includes('embed')) {
+      mediaHtml = `<iframe src="${data.url}" frameborder="0" allowfullscreen></iframe>`;
+    } else {
+      mediaHtml = `<video src="${data.url}" controls></video>`;
+    }
+  } else {
+    mediaHtml = `<p>> MEDIA UNREADABLE</p>`;
+  }
+
+  appContainer.innerHTML = `
+    <div class="apod-card">
+      <h1>${data.title}</h1>
+      <p class="date">[ DATE: ${data.date} ]</p>
+      <div class="media-wrapper">
+        ${mediaHtml}
+      </div>
+      <p class="explanation">${data.explanation || ''}</p>
+    </div>
+  `;
+}
+
+// Feature: Select a random date between June 16, 1995 (APOD Launch) and today
+function pickRandomDate() {
+  const startDate = new Date('1995-06-16').getTime();
+  const endDate = new Date().getTime();
+  const randomTime = startDate + Math.random() * (endDate - startDate);
+
+  const randomDateStr = new Date(randomTime).toISOString().split('T')[0];
+  dateInput.value = randomDateStr;
+  loadSpacePicture(randomDateStr);
+}
+
+// Event Listeners
+dateInput.addEventListener('change', (e) => loadSpacePicture(e.target.value));
+randomButton.addEventListener('click', pickRandomDate);
+
+// Initial Load
+loadSpacePicture(todayString);

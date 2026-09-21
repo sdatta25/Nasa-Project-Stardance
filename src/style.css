@@ -6,210 +6,92 @@
 
 body {
   min-height: 100vh;
-  background-color: #100224;
-  color: #ffffff;
-  font-family: 'Black Ops One', sans-serif;
-  position: relative;
+  background-color: #0d0f0d;
+  color: #33ff33;
+  font-family: 'Press Start 2P', monospace;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 2rem;
-  overflow-x: hidden;
+  padding: 1.5rem;
+  /* Retro CRT Monitor Scanline Effect */
+  background-image: linear-gradient(rgba(18, 16, 16, 0) 50%,
+      rgba(0, 0, 0, 0.25) 50%);
+  background-size: 100% 4px;
 }
 
-/* Left Zigzag Side Border */
-body::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 60px;
-  height: 100vh;
-  background: #ff0055;
-  z-index: 1;
-  pointer-events: none;
-  clip-path: polygon(0 0,
-      100% 0,
-      15% 2.5%,
-      100% 5%,
-      15% 7.5%,
-      100% 10%,
-      15% 12.5%,
-      100% 15%,
-      15% 17.5%,
-      100% 20%,
-      15% 22.5%,
-      100% 25%,
-      15% 27.5%,
-      100% 30%,
-      15% 32.5%,
-      100% 35%,
-      15% 37.5%,
-      100% 40%,
-      15% 42.5%,
-      100% 45%,
-      15% 47.5%,
-      100% 50%,
-      15% 52.5%,
-      100% 55%,
-      15% 57.5%,
-      100% 60%,
-      15% 62.5%,
-      100% 65%,
-      15% 67.5%,
-      100% 70%,
-      15% 72.5%,
-      100% 75%,
-      15% 77.5%,
-      100% 80%,
-      15% 82.5%,
-      100% 85%,
-      15% 87.5%,
-      100% 90%,
-      15% 92.5%,
-      100% 95%,
-      15% 97.5%,
-      100% 100%,
-      0 100%);
-}
-
-/* Right Zigzag Side Border */
-body::after {
-  content: '';
-  position: fixed;
-  top: 0;
-  right: 0;
-  width: 60px;
-  height: 100vh;
-  background: #ff0055;
-  z-index: 1;
-  pointer-events: none;
-  clip-path: polygon(0 0,
-      100% 0,
-      100% 100%,
-      0 100%,
-      85% 97.5%,
-      0 95%,
-      85% 92.5%,
-      0 90%,
-      85% 87.5%,
-      0 85%,
-      85% 82.5%,
-      0 80%,
-      85% 77.5%,
-      0 75%,
-      85% 72.5%,
-      0 70%,
-      85% 67.5%,
-      0 65%,
-      85% 62.5%,
-      0 60%,
-      85% 57.5%,
-      0 55%,
-      85% 52.5%,
-      0 50%,
-      85% 47.5%,
-      0 45%,
-      85% 42.5%,
-      0 40%,
-      85% 37.5%,
-      0 35%,
-      85% 32.5%,
-      0 30%,
-      85% 27.5%,
-      0 25%,
-      85% 22.5%,
-      0 20%,
-      85% 17.5%,
-      0 15%,
-      85% 12.5%,
-      0 10%,
-      85% 7.5%,
-      0 5%,
-      85% 2.5%,
-      0 0);
-}
-
-/* Calendar Date Controls */
+/* Controls Header */
 .controls {
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: 0.75rem;
-  font-family: 'Orbitron', sans-serif;
-  color: #00f0ff;
-  z-index: 2;
+  gap: 1rem;
 }
 
-input[type="date"] {
-  padding: 0.5rem 1rem;
-  font-family: 'Black Ops One', sans-serif;
-  font-size: 1rem;
-  border-radius: 6px;
-  border: 2px solid #ff0055;
-  background-color: #100224;
-  color: #ffffff;
+label {
+  font-size: 0.8rem;
+  color: #33ff33;
+  text-shadow: 0 0 5px #33ff33;
+}
+
+input[type="date"],
+button {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.75rem;
+  padding: 0.6rem 0.8rem;
+  background-color: #000000;
+  color: #33ff33;
+  border: 3px solid #33ff33;
   outline: none;
   cursor: pointer;
-  box-shadow: 0 0 10px rgba(255, 0, 85, 0.4);
+  box-shadow: 3px 3px 0px #1a801a;
 }
 
+button:hover,
 input[type="date"]:focus {
-  border-color: #00f0ff;
-  box-shadow: 0 0 14px rgba(0, 240, 255, 0.7);
+  background-color: #33ff33;
+  color: #000000;
 }
 
-/* Calendar icon color inversion for dark background */
+button:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0px #1a801a;
+}
+
 ::-webkit-calendar-picker-indicator {
   filter: invert(1);
   cursor: pointer;
 }
 
-/* App Layout Container */
+/* APOD Display Screen */
 #app {
-  max-width: 800px;
+  max-width: 750px;
   width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  z-index: 2;
 }
 
 .apod-card {
+  border: 4px solid #33ff33;
+  background-color: #000000;
+  padding: 1.5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.5rem;
-  background: rgba(255, 255, 255, 0.05);
-  padding: 2rem;
-  border-radius: 12px;
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  gap: 1.2rem;
+  box-shadow: 6px 6px 0px #1a801a;
 }
 
 h1 {
-  font-family: 'Orbitron', sans-serif;
-  font-weight: 900;
-  font-size: 2rem;
-  color: #00f0ff;
-  text-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
-  line-height: 1.2;
-}
-
-p {
-  font-family: 'Black Ops One', sans-serif;
-  line-height: 1.6;
+  font-size: 1.1rem;
+  color: #ffb000;
+  text-shadow: 0 0 4px #ffb000;
+  text-align: center;
+  line-height: 1.4;
 }
 
 .date {
-  color: #ff0055;
-  font-size: 1.1rem;
-}
-
-.explanation {
-  font-size: 0.95rem;
-  color: #d1d5db;
-  text-align: justify;
+  font-size: 0.75rem;
+  color: #33ff33;
 }
 
 .media-wrapper {
@@ -222,33 +104,37 @@ img,
 iframe,
 video {
   width: 100%;
-  max-width: 700px;
-  height: 400px;
+  max-height: 420px;
+  border: 3px solid #33ff33;
   object-fit: cover;
-  border-radius: 8px;
-  border: 2px solid #00f0ff;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
 }
 
-/* Mobile Responsiveness */
+.explanation {
+  font-size: 0.65rem;
+  line-height: 1.7;
+  color: #b3ffb3;
+  text-align: left;
+}
+
+.loading,
+.error-card {
+  font-size: 0.8rem;
+  color: #ffb000;
+  padding: 2rem;
+  text-align: center;
+}
+
+/* Mobile View Adjustments */
 @media (max-width: 600px) {
-
-  body::before,
-  body::after {
-    display: none;
-  }
-
   body {
-    padding: 1rem;
+    padding: 0.8rem;
   }
 
   h1 {
-    font-size: 1.5rem;
+    font-size: 0.85rem;
   }
 
-  img,
-  iframe,
-  video {
-    height: 250px;
+  .explanation {
+    font-size: 0.55rem;
   }
 }
