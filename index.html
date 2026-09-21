@@ -1,24 +1,31 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Retro Space Arcade - NASA APOD</title>
-  <!-- Pixel Arcade Font -->
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NASA Daily Space View</title>
+  <link rel="stylesheet" href="./src/style.css">
 </head>
 
 <body>
-  <div class="controls">
-    <label for="datepicker">DATE:</label>
-    <input type="date" id="datepicker" />
-    <button id="random-btn">[?] RANDOM DAY</button>
-  </div>
 
-  <div id="app"></div>
+  <header class="header">
+    <h1>NASA Space Desk</h1>
+    <p>Explore today's picture or jump back in time</p>
+  </header>
 
+  <section class="controls">
+    <div class="control-group">
+      <label for="datepicker">Select Date:</label>
+      <input type="date" id="datepicker">
+    </div>
+    <button id="random-btn">Surprise Me</button>
+  </section>
+
+  <main id="app"></main>
   <script type="module" src="/src/main.js"></script>
+
 </body>
 
 </html>

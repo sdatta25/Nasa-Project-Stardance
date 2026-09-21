@@ -1,82 +1,75 @@
 import './style.css';
 
-// Config & Element Selectors
-const API_KEY = import.meta.env.VITE_NASA_API_KEY || 'DEMO_KEY';
+// DOM Elements
+const apiKey = import.meta.env.VITE_NASA_API_KEY || 'DEMO_KEY';
 const appContainer = document.getElementById('app');
-const dateInput = document.getElementById('datepicker');
+const datePicker = document.getElementById('datepicker');
 const randomButton = document.getElementById('random-btn');
 
-// Set max date allowed to today (YYYY-MM-DD)
-const todayString = new Date().toISOString().split('T')[0];
-dateInput.max = todayString;
-dateInput.value = todayString;
+// Set max date limit to today
+const today = new Date().toISOString().split('T')[0];
+datePicker.max = today;
+datePicker.value = today;
 
-// Fetch APOD telemetry using standard async/await
-async function loadSpacePicture(targetDate) {
-  appContainer.innerHTML = `<p class="loading">> LOADING TELEMETRY...</p>`;
-
-  const endpoint = `https://api.nasa.gov/planetary/apod?api_key=${API_KEY}&date=${targetDate}`;
+// Fetch APOD data from NASA API
+async function loadApod(dateString) {
+  appContainer.innerHTML = `<div class="status-msg">Fetching space image...</div>`;
 
   try {
-    const response = await fetch(endpoint);
-    if (!response.ok) {
-      throw new Error(`Status: ${response.status}`);
+    const res = await fetch(`https://api.nasa.gov/planetary/apod?api_key=${apiKey}&date=${dateString}`);
+
+    if (!res.ok) {
+      throw new Error(`Server returned status ${res.status}`);
     }
 
-    const apodData = await response.json();
-    renderScreen(apodData);
-  } catch (error) {
+    const data = await res.json();
+    renderContent(data);
+  } catch (err) {
     appContainer.innerHTML = `
-      <div class="error-card">
-        <p>> TRANSMISSION ERROR</p>
-        <p>${error.message}</p>
+      <div class="status-msg error">
+        <p>Could not load APOD data.</p>
+        <small>${err.message}</small>
       </div>
     `;
   }
 }
 
-// Build media frame and text layout
-function renderScreen(data) {
-  let mediaHtml = '';
+// Display content cleanly inside the container
+function renderContent(data) {
+  let mediaElement = '';
 
   if (data.media_type === 'image') {
-    mediaHtml = `<img src="${data.url}" alt="${data.title}" />`;
+    mediaElement = `<img src="${data.url}" alt="${data.title}">`;
   } else if (data.media_type === 'video') {
-    if (data.url.includes('youtube') || data.url.includes('vimeo') || data.url.includes('embed')) {
-      mediaHtml = `<iframe src="${data.url}" frameborder="0" allowfullscreen></iframe>`;
-    } else {
-      mediaHtml = `<video src="${data.url}" controls></video>`;
-    }
+    mediaElement = `<iframe src="${data.url}" frameborder="0" allowfullscreen></iframe>`;
   } else {
-    mediaHtml = `<p>> MEDIA UNREADABLE</p>`;
+    mediaElement = `<p class="unknown-media">Media type not supported for display.</p>`;
   }
 
   appContainer.innerHTML = `
-    <div class="apod-card">
-      <h1>${data.title}</h1>
-      <p class="date">[ DATE: ${data.date} ]</p>
-      <div class="media-wrapper">
-        ${mediaHtml}
-      </div>
-      <p class="explanation">${data.explanation || ''}</p>
-    </div>
+    <article class="apod-card">
+      <h2>${data.title}</h2>
+      <span class="date-badge">${data.date}</span>
+      <div class="media-container">${mediaElement}</div>
+      <p class="description">${data.explanation || ''}</p>
+    </article>
   `;
 }
 
-// Feature: Select a random date between June 16, 1995 (APOD Launch) and today
-function pickRandomDate() {
-  const startDate = new Date('1995-06-16').getTime();
-  const endDate = new Date().getTime();
-  const randomTime = startDate + Math.random() * (endDate - startDate);
+// Pick a random date between APOD launch (June 16, 1995) and today
+function handleRandomClick() {
+  const minTime = new Date('1995-06-16').getTime();
+  const maxTime = new Date().getTime();
+  const randomTime = minTime + Math.random() * (maxTime - minTime);
 
   const randomDateStr = new Date(randomTime).toISOString().split('T')[0];
-  dateInput.value = randomDateStr;
-  loadSpacePicture(randomDateStr);
+  datePicker.value = randomDateStr;
+  loadApod(randomDateStr);
 }
 
-// Event Listeners
-dateInput.addEventListener('change', (e) => loadSpacePicture(e.target.value));
-randomButton.addEventListener('click', pickRandomDate);
+// Listen for interactions
+datePicker.addEventListener('change', (e) => loadApod(e.target.value));
+randomButton.addEventListener('click', handleRandomClick);
 
-// Initial Load
-loadSpacePicture(todayString);
+// Load today's picture on initial start
+loadApod(today);
