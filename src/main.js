@@ -1,6 +1,7 @@
 import './style.css';
 
-const API_KEY = import.meta.env.VITE_NASA_API_KEY;
+// Fallback to DEMO_KEY if VITE_NASA_API_KEY environment variable is missing
+const API_KEY = import.meta.env.VITE_NASA_API_KEY || 'DEMO_KEY';
 const app = document.querySelector('#app');
 const datePicker = document.querySelector('#datepicker');
 
@@ -28,10 +29,15 @@ function fetchAPOD(selectedDate = '') {
 
       if (data.media_type === 'image') {
         media = `<img src="${data.url}" alt="${data.title}" />`;
-      } else if (data.url.includes('youtube.com') || data.url.includes('youtu.be')) {
-        media = `<iframe src="${data.url}" frameborder="0" allowfullscreen></iframe>`;
+      } else if (data.media_type === 'video') {
+        // Render as iframe if it's an embedded web player (like YouTube or Vimeo)
+        if (data.url.includes('youtube') || data.url.includes('vimeo') || data.url.includes('embed')) {
+          media = `<iframe src="${data.url}" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+        } else {
+          media = `<video src="${data.url}" controls></video>`;
+        }
       } else {
-        media = `<video src="${data.url}" controls></video>`;
+        media = `<p>Unsupported media format</p>`;
       }
 
       app.innerHTML = `
@@ -41,7 +47,7 @@ function fetchAPOD(selectedDate = '') {
           <div class="media-wrapper">
             ${media}
           </div>
-          <p class="explanation">${data.explanation}</p>
+          <p class="explanation">${data.explanation || ''}</p>
         </div>
       `;
     })
